@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="noticeMapper">
+
+
+	<select id="selectAll" resultType="notice">
+		select code, subject, content, regdate, filename
+		from notice
+		order by code desc
+	</select>
+	
+	<select id="selectByCode" parameterType="int" resultType="notice">
+		select code, subject, content, regdate, filename
+		from notice
+		where code=#{_parameter}
+	</select>
+	
+	<insert id="insert" parameterType="notice">
+		insert into notice (code, subject, content, regdate, filename) values (SEQ_NO.nextval, #{subject}, #{content}, sysdate, #{filename})
+	</insert>
+	
+	<update id="update" parameterType="notice">
+		update notice 
+		set subject=#{subject}, content=#{content}, filename=#{filename}
+		where code=#{code}		
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		delete
+		from notice
+		where code=#{_parameter}
+	</delete>
+	
+	<select id="selectFundingRequest" resultType="fundingRequest">
+		select code, member_code, subject, state, regdate from funding_request order by code desc
+	</select>
+	
+	<insert id="fundInsert" parameterType="funding">
+		insert into funding values(SEQ_NO.nextval, #{mdCode}, #{title}, #{rewardName}, #{rewardPrice}, #{goalPrice}, 0, #{image}, #{category}, #{openDate}, #{endDate}, '502')
+	</insert>
+	
+	<select id="selectFundingRequestByCode" parameterType="int" resultType="fundingRequest">
+		select code, member_code, subject, filename, state, regdate from funding_request where code=#{_parameter}
+	</select>
+	
+	<update id="fundingRequestReject" parameterType="int">
+		update funding_request set state='100' where code=#{code}
+	</update>
+	
+	<update id="fundingRequestApprove" parameterType="int">
+		update funding_request set state='101' where code=#{code}
+	</update>
+	
+	<update id="fundingRequestStateChange" parameterType="int">
+		update funding_request set state='103' where code=#{code}
+	</update>
+	
+	<select id="listCount" resultType="int">
+		select count(*) from notice
+	</select>
+	
+	<select id="noticeList" parameterType="map" resultType="notice">
+	<![CDATA[
+		SELECT code, subject, content, regdate 
+		FROM (SELECT a.*, ROWNUM rnum FROM (SELECT * FROM notice ORDER BY code DESC) a 
+		WHERE ROWNUM <= (#{startIndex}*#{cntPerPage})) WHERE rnum >= ((#{startIndex}-1)*#{cntPerPage}+1)
+	]]>	
+	</select>
+	
+	<select id="fundingRequestlistCount" resultType="int">
+		select count(*) from funding_request
+	</select>
+	
+	<select id="fundingRequestList" parameterType="map" resultType="fundingRequest">
+	<![CDATA[
+		SELECT code, subject, state, regdate 
+		FROM (SELECT a.*, ROWNUM rnum FROM (SELECT * FROM funding_request ORDER BY code DESC) a 
+		WHERE ROWNUM <= (#{startIndex}*#{cntPerPage})) WHERE rnum >= ((#{startIndex}-1)*#{cntPerPage}+1)
+	]]>	
+	</select>
+	
+	<insert id="insertStatistics">
+		insert into statistics values(sysdate, 0,0,0,0,0)
+	</insert>
+
+</mapper>	
+
+
+
+
+
+
+
+
